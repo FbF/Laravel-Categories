@@ -38,7 +38,7 @@ Ensure the categories `types` are set correctly in the config file.
 
 Run the seed (this will create root nodes for each of your category `types`)
 
-	php artisan db:seed --class=Fbf\LaravelCategories\CategoriesTableBase
+	php artisan db:seed --class=Fbf\LaravelCategories\CategoriesTableBaseSeeder
 
 Build your menus in the database, or if you are using FrozenNode's Laravel Administrator, see the info below
 
