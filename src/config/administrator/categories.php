@@ -35,6 +35,16 @@ return array(
 		'slug' => array(
 			'title' => 'Slug',
 		),
+		'published_date' => array(
+			'title' => 'Published'
+		),
+		'status' => array(
+			'title' => 'Status',
+			'select' => "CASE (:table).status WHEN '".Fbf\LaravelBlog\Post::APPROVED."' THEN 'Approved' WHEN '".Fbf\LaravelBlog\Post::DRAFT."' THEN 'Draft' END",
+		),
+		'updated_at' => array(
+			'title' => 'Last Updated'
+		),
 	),
 
 	/**
@@ -56,8 +66,32 @@ return array(
 			'title' => 'Slug',
 			'visible' => function($model)
 				{
-					return $model->exists();
+					return $model->exists;
 				},
+		),
+		'status' => array(
+			'type' => 'enum',
+			'title' => 'Status',
+			'options' => array(
+				Fbf\LaravelBlog\Post::DRAFT => 'Draft',
+				Fbf\LaravelBlog\Post::APPROVED => 'Approved',
+			),
+		),
+		'published_date' => array(
+			'title' => 'Published Date',
+			'type' => 'datetime',
+			'date_format' => 'yy-mm-dd', //optional, will default to this value
+			'time_format' => 'HH:mm',    //optional, will default to this value
+		),
+		'created_at' => array(
+			'title' => 'Created',
+			'type' => 'datetime',
+			'editable' => false,
+		),
+		'updated_at' => array(
+			'title' => 'Updated',
+			'type' => 'datetime',
+			'editable' => false,
 		),
 	),
 
@@ -72,6 +106,18 @@ return array(
 		),
 		'slug' => array(
 			'title' => 'Slug',
+		),
+		'status' => array(
+			'type' => 'enum',
+			'title' => 'Status',
+			'options' => array(
+				Fbf\LaravelBlog\Post::DRAFT => 'Draft',
+				Fbf\LaravelBlog\Post::APPROVED => 'Approved',
+			),
+		),
+		'published_date' => array(
+			'title' => 'Published Date',
+			'type' => 'date',
 		),
 	),
 
@@ -103,9 +149,13 @@ return array(
 				{
 					if (!Request::segment(3))
 					{
-						return true;
+						return false;
 					}
 					$model = $model->where('id','=',Request::segment(3))->first();
+					if (!is_object($model))
+					{
+						return false;
+					}
 					return !is_null($model->getLeftSibling());
 				},
 			//the model is passed to the closure
@@ -126,9 +176,13 @@ return array(
 				{
 					if (!Request::segment(3))
 					{
-						return true;
+						return false;
 					}
 					$model = $model->where('id','=',Request::segment(3))->first();
+					if (!is_object($model))
+					{
+						return false;
+					}
 					return !is_null($model->getRightSibling());
 				},
 			//the model is passed to the closure
@@ -147,8 +201,8 @@ return array(
 	 */
 	'rules' => array(
 		'parent_id' => 'required|integer|min:1',
-		'name' => 'required',
-		'slug' => 'required',
+		'name' => 'required|max:255',
+		'slug' => 'alpha_dash|max:255',
 	),
 
 	/**
